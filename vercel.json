@@ -1,11 +1,10 @@
 {
   "version": 2,
+  "name": "marriage-quiz",
   "builds": [
-    { "src": "*.html", "use": "@vercel/static" }
+    { "src": "marriage-quiz.html", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "/quiz", "dest": "/marriage-quiz.html" },
-    { "src": "/sales", "dest": "/sales-page.html" },
-    { "src": "/", "dest": "/sales-page.html" }
+    { "src": "/", "dest": "/marriage-quiz.html" }
   ]
 }
