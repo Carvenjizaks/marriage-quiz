@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>How Connected Is Your Marriage? (2-Min Quiz)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+        .quiz-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { color: #8B1538; text-align: center; }
+        .question { margin: 25px 0; }
+        .question h3 { color: #333; font-size: 18px; margin-bottom: 10px; }
+        .options label { display: block; padding: 10px; margin: 5px 0; background: #f9f9f9; border-radius: 5px; cursor: pointer; }
+        .options label:hover { background: #e9e9e9; }
+        input[type="radio"] { margin-right: 10px; }
+        #email-section { margin: 30px 0; padding: 20px; background: #f0f0f0; border-radius: 5px; }
+        input[type="email"] { width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #8B1538; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 18px; cursor: pointer; width: 100%; }
+        button:hover { background: #6b0f2a; }
+        #results { display: none; margin-top: 30px; padding: 20px; background: #e8f5e9; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>How Connected Is Your Marriage? (2-Min Quiz)</h1>
+        <p style="text-align: center; color: #666;">Discover your marriage communication style and identify growth areas.</p>
+        
+        <form id="marriageQuiz">
+            <div class="question">
+                <h3>1. When you disagree, what typically happens?</h3>
+                <div class="options">
+                    <label><input type="radio" name="q1" value="3" required> We talk it through calmly and find compromise</label>
+                    <label><input type="radio" name="q1" value="2"> One of us shuts down and we avoid the topic</label>
+                    <label><input type="radio" name="q1" value="1"> It escalates quickly with raised voices</label>
+                    <label><input type="radio" name="q1" value="0"> We pretend it&apos;s fine but resentment builds</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>2. How often do you have meaningful conversations (not about logistics/kids)?</h3>
+                <div class="options">
+                    <label><input type="radio" name="q2" value="3" required> Daily - we connect deeply every day</label>
+                    <label><input type="radio" name="q2" value="2"> A few times a week</label>
+                    <label><input type="radio" name="q2" value="1"> Rarely - we&apos;re too busy or distracted</label>
+                    <label><input type="radio" name="q2" value="0"> It&apos;s been months since a real heart-to-heart</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>3. How aligned are you spiritually as a couple?</h3>
+                <div class="options">
+                    <label><input type="radio" name="q3" value="3" required> Very aligned - we pray/study together regularly</label>
+                    <label><input type="radio" name="q3" value="2"> Somewhat aligned but could be deeper</label>
+                    <label><input type="radio" name="q3" value="1"> We have different spiritual needs/approaches</label>
+                    <label><input type="radio" name="q3" value="0"> This is a source of tension between us</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>4. How would you describe your physical connection?</h3>
+                <div class="options">
+                    <label><input type="radio" name="q4" value="3" required> Strong and fulfilling for both of us</label>
+                    <label><input type="radio" name="q4" value="2"> Good but sometimes inconsistent due to busyness</label>
+                    <label><input type="radio" name="q4" value="1"> Strained or lacking - we need help here</label>
+                    <label><input type="radio" name="q4" value="0"> This is a sensitive/frustrating area</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>5. What&apos;s your biggest external stress on the marriage?</h3>
+                <div class="options">
+                    <label><input type="radio" name="q5" value="financial" required> Financial pressure/debt</label>
+                    <label><input type="radio" name="q5" value="work"> Work-life balance/busyness</label>
+                    <label><input type="radio" name="q5" value="parenting"> Parenting challenges</label>
+                    <label><input type="radio" name="q5" value="family"> Extended family/boundaries</label>
+                    <label><input type="radio" name="q5" value="health"> Health issues</label>
+                    <label><input type="radio" name="q5" value="transitions"> Life transitions (new baby, moving, etc.)</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>6. After a disagreement, how long does it take to reconnect?</h3>
+                <div class="options">
+                    <label><input type="radio" name="q6" value="3" required> We resolve things same-day</label>
+                    <label><input type="radio" name="q6" value="2"> Within 24-48 hours</label>
+                    <label><input type="radio" name="q6" value="1"> Days or weeks of tension</label>
+                    <label><input type="radio" name="q6" value="0"> We have unresolved issues from months/years ago</label>
+                </div>
+            </div>
+            
+            <div class="question">
+                <h3>7. What&apos;s the #1 thing you&apos;d want to learn at a marriage conference?</h3>
+                <div class="options">
+                    <label><input type="radio" name="q7" value="communication" required> Better communication tools</label>
+                    <label><input type="radio" name="q7" value="intimacy"> Rekindling intimacy and romance</label>
+                    <label><input type="radio" name="q7" value="conflict"> Managing conflict biblically</label>
+                    <label><input type="radio" name="q7" value="spiritual"> Building spiritual unity</label>
+                    <label><input type="radio" name="q7" value="balance"> Balancing marriage with parenting/career</label>
+                    <label><input type="radio" name="q7" value="healing"> Healing from past hurts/betrayal</label>
+                </div>
+            </div>
+            
+            <div id="email-section">
+                <h3>Get Your Results + Conference Updates</h3>
+                <input type="email" id="email" name="email" placeholder="Enter your email address" required>
+            </div>
+            
+            <button type="submit">Get My Results</button>
+        </form>
+        
+        <div id="results">
+            <h2>Your Marriage Assessment Results</h2>
+            <div id="result-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.getElementById('marriageQuiz').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Calculate score
+            let score = 0;
+            score += parseInt(document.querySelector('input[name="q1"]:checked').value);
+            score += parseInt(document.querySelector('input[name="q2"]:checked').value);
+            score += parseInt(document.querySelector('input[name="q3"]:checked').value);
+            score += parseInt(document.querySelector('input[name="q4"]:checked').value);
+            score += parseInt(document.querySelector('input[name="q6"]:checked').value);
+            
+            let resultText = '';
+            if (score >= 15) {
+                resultText = '<h3>The Connected Couple</h3><p>You&apos;re doing well but even strong marriages need tune-ups! Join us at MyGreatMarriage Conference to go from good to great.</p>';
+            } else if (score >= 10) {
+                resultText = '<h3>The Busy Disconnected</h3><p>Life is pulling you apart - it&apos;s time to prioritize your marriage. MyGreatMarriage Conference will give you the tools to reconnect.</p>';
+            } else if (score >= 5) {
+                resultText = '<h3>The Struggling Pair</h3><p>You&apos;re not alone - every marriage faces seasons like this. Find hope and practical solutions at MyGreatMarriage Conference.</p>';
+            } else {
+                resultText = '<h3>The Crisis Point</h3><p>It&apos;s not too late - help and healing are available. MyGreatMarriage Conference is your first step toward restoration.</p>';
+            }
+            
+            resultText += '<br><a href="#" style="background:#8B1538;color:white;padding:15px 30px;text-decoration:none;border-radius:5px;display:inline-block;">Register for MyGreatMarriage Conference</a>';
+            
+            document.getElementById('result-content').innerHTML = resultText;
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('marriageQuiz').style.display = 'none';
+            
+            // In a real implementation, you'd send the data to a server here
+            console.log('Email:', document.getElementById('email').value);
+            console.log('Score:', score);
+        });
+    </script>
+</body>
+</html>

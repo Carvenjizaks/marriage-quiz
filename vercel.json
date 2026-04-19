@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "marriage-quiz",
+  "builds": [
+    { "src": "marriage-quiz.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/", "dest": "/marriage-quiz.html" }
+  ]
+}
