@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marriage Quiz - Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            background: white;
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .login-screen h2 {
+            text-align: center;
+            margin-bottom: 24px;
+            color: #333;
+        }
+        
+        .login-screen input {
+            width: 100%;
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .login-screen input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-screen button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .login-screen button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: none;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #999;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        /* Table */
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 20px 24px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h2 {
+            color: #333;
+            font-size: 1.25rem;
+        }
+        
+        .refresh-btn {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        
+        .refresh-btn:hover {
+            background: #5568d3;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            background: #f8f9fa;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 60px;
+            color: #999;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #666;
+        }
+        
+        .score-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+        
+        .score-low {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .score-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .score-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .truncate {
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Screen -->
+        <div class="login-screen" id="loginScreen">
+            <h2>🔐 Admin Login</h2>
+            <input type="password" id="passwordInput" placeholder="Enter admin password" autocomplete="off">
+            <button onclick="login()">Login</button>
+            <p class="error-message" id="errorMessage">Incorrect password</p>
+        </div>
+        
+        <!-- Dashboard -->
+        <div class="dashboard" id="dashboard">
+            <button class="logout-btn" onclick="logout()">Logout</button>
+            <h1>📊 Marriage Quiz Dashboard</h1>
+            
+            <!-- Stats Grid -->
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <h3>Total Responses</h3>
+                    <div class="stat-value" id="totalResponses">-</div>
+                    <div class="stat-label">quiz submissions</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg Financial Tension</h3>
+                    <div class="stat-value" id="avgFinancialTension">-</div>
+                    <div class="stat-label">out of 10</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Avg Difficult Talks</h3>
+                    <div class="stat-value" id="avgDifficultTalks">-</div>
+                    <div class="stat-label">out of 10</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Unique Locations</h3>
+                    <div class="stat-value" id="uniqueLocations">-</div>
+                    <div class="stat-label">cities/countries</div>
+                </div>
+            </div>
+            
+            <!-- Responses Table -->
+            <div class="table-container">
+                <div class="table-header">
+                    <h2>📋 All Responses</h2>
+                    <button class="refresh-btn" onclick="loadData()">🔄 Refresh</button>
+                </div>
+                <div id="tableContent">
+                    <div class="loading">Loading responses...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // CONFIGURATION - UPDATE THESE VALUES
+        // ============================================
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_SERVICE_ROLE_KEY = 'YOUR_SUPABASE_SERVICE_ROLE_KEY';
+        const ADMIN_PASSWORD = 'admin123'; // Change this in production!
+        
+        // Initialize Supabase client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+        
+        // Check if already logged in
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+            showDashboard();
+            loadData();
+        }
+        
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                showDashboard();
+                loadData();
+            } else {
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+            }
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            location.reload();
+        }
+        
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+        }
+        
+        // Allow Enter key to submit
+        document.getElementById('passwordInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+        
+        async function loadData() {
+            try {
+                // Fetch all responses
+                const { data: responses, error } = await supabase
+                    .from('quiz_responses')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                // Update stats
+                updateStats(responses);
+                
+                // Render table
+                renderTable(responses);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                document.getElementById('tableContent').innerHTML = `
+                    <div class="no-data">
+                        ❌ Error loading data: ${error.message}<br>
+                        <small>Check your Supabase configuration</small>
+                    </div>
+                `;
+            }
+        }
+        
+        function updateStats(responses) {
+            const total = responses.length;
+            const avgFinancial = total > 0 
+                ? (responses.reduce((sum, r) => sum + r.financial_tension, 0) / total).toFixed(1)
+                : '-';
+            const avgTalks = total > 0 
+                ? (responses.reduce((sum, r) => sum + r.difficult_talks, 0) / total).toFixed(1)
+                : '-';
+            const uniqueLocs = total > 0 
+                ? new Set(responses.map(r => r.location)).size 
+                : '-';
+            
+            document.getElementById('totalResponses').textContent = total;
+            document.getElementById('avgFinancialTension').textContent = avgFinancial;
+            document.getElementById('avgDifficultTalks').textContent = avgTalks;
+            document.getElementById('uniqueLocations').textContent = uniqueLocs;
+        }
+        
+        function getScoreClass(score) {
+            if (score <= 3) return 'score-low';
+            if (score <= 6) return 'score-medium';
+            return 'score-high';
+        }
+        
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+        
+        function renderTable(responses) {
+            if (responses.length === 0) {
+                document.getElementById('tableContent').innerHTML = `
+                    <div class="no-data">
+                        📭 No responses yet<br>
+                        <small>Quiz submissions will appear here</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Pressure Source</th>
+                            <th>Financial Tension</th>
+                            <th>Impact Area</th>
+                            <th>Difficult Talks</th>
+                            <th>Greatest Need</th>
+                            <th>Open to Help</th>
+                            <th>Biggest Challenge</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${responses.map(r => `
+                            <tr>
+                                <td>${formatDate(r.created_at)}</td>
+                                <td>${r.location}</td>
+                                <td>${r.pressure}</td>
+                                <td>
+                                    <span class="score-badge ${getScoreClass(r.financial_tension)}">
+                                        ${r.financial_tension}/10
+                                    </span>
+                                </td>
+                                <td>${r.impact_area}</td>
+                                <td>
+                                    <span class="score-badge ${getScoreClass(r.difficult_talks)}">
+                                        ${r.difficult_talks}/10
+                                    </span>
+                                </td>
+                                <td>${r.greatest_need}</td>
+                                <td>${r.open_to_help}</td>
+                                <td class="truncate" title="${r.biggest_challenge || ''}">
+                                    ${r.biggest_challenge || '-'}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            document.getElementById('tableContent').innerHTML = html;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3-Minute Relationship & Home Check | The Fatherhood Foundation</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+        .progress-bar {
+            height: 4px;
+            background: #e5e7eb;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .quiz-body {
+            padding: 30px;
+        }
+        .question {
+            margin-bottom: 30px;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .question-number {
+            display: inline-block;
+            background: #3730a3;
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .question h3 {
+            font-size: 18px;
+            color: #1f2937;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            position: relative;
+        }
+        .option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+        }
+        .option label {
+            display: block;
+            padding: 15px 20px;
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 15px;
+            color: #374151;
+        }
+        .option label:hover {
+            background: #f3f4f6;
+            border-color: #c7d2fe;
+        }
+        .option input[type="radio"]:checked + label {
+            background: #eef2ff;
+            border-color: #6366f1;
+            color: #3730a3;
+            font-weight: 500;
+        }
+        .option input[type="radio"]:focus + label {
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .text-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+        .text-input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e5e7eb;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-prev {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        .btn-prev:hover {
+            background: #e5e7eb;
+        }
+        .btn-next, .btn-submit {
+            background: linear-gradient(135deg, #3730a3 0%, #6366f1 100%);
+            color: white;
+        }
+        .btn-next:hover, .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+        .results {
+            display: none;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        .results-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        .results h2 {
+            font-size: 26px;
+            color: #1f2937;
+            margin-bottom: 15px;
+        }
+        .results-intro {
+            font-size: 16px;
+            color: #6b7280;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .insight-card {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .insight-card h4 {
+            color: #3730a3;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+        .insight-card p {
+            color: #374151;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .cta-section {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3730a3 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+        }
+        .cta-section h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+        .cta-section p {
+            opacity: 0.9;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .cta-button {
+            display: inline-block;
+            background: white;
+            color: #3730a3;
+            padding: 14px 32px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .anonymous-note {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-top: 20px;
+        }
+        .hidden { display: none !important; }
+        
+        /* Loading state */
+        .submitting {
+            position: relative;
+            pointer-events: none;
+        }
+        .submitting::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid #fff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Error message */
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        @media (max-width: 600px) {
+            .header { padding: 30px 20px; }
+            .header h1 { font-size: 22px; }
+            .quiz-body { padding: 20px; }
+            .option label { padding: 12px 15px; font-size: 14px; }
+            .btn { padding: 12px 20px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏠 3-Minute Relationship & Home Check</h1>
+            <p>Life is busy. Pressure is real. Take this quick check-in and tell us what families and relationships are facing right now.</p>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <form id="quizForm" class="quiz-body">
+            <!-- Error message container -->
+            <div class="error-message" id="errorMessage"></div>
+            
+            <!-- Question 1: Location -->
+            <div class="question" data-q="1">
+                <h3><span class="question-number">1</span>Where are you responding from?</h3>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" name="location" value="namibia" id="loc1" required>
+                        <label for="loc1">🇳🇦 Namibia</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="location" value="south_africa" id="loc2">
+                        <label for="loc2">🇿🇦 South Africa</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="location" value="other" id="loc3">
+                        <label for="loc3">🌍 Other</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 2: Primary Pressure -->
+            <div class="question hidden" data-q="2">
+                <h3><span class="question-number">2</span>What is putting the most pressure on your home right now?</h3>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" name="pressure" value="job" id="pres1" required>
+                        <label for="pres1">💼 Job stress or unemployment</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="pressure" value="financial" id="pres2">
+                        <label for="pres2">💰 Financial pressure / cost of living</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="pressure" value="communication" id="pres3">
+                        <label for="pres3">💬 Communication in the relationship</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="pressure" value="parenting" id="pres4">
+                        <label for="pres4">👶 Parenting / children</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="pressure" value="time" id="pres5">
+                        <label for="pres5">⏰ Time pressure / busy schedule</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="pressure" value="emotional" id="pres6">
+                        <label for="pres6">😔 Emotional or mental stress</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 3: Financial Tension -->
+            <div class="question hidden" data-q="3">
+                <h3><span class="question-number">3</span>How often do financial pressures create tension at home?</h3>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" name="financial_tension" value="1" id="fin1" required>
+                        <label for="fin1">Never (1)</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="financial_tension" value="3" id="fin2">
+                        <label for="fin2">Rarely (3)</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="financial_tension" value="5" id="fin3">
+                        <label for="fin3">Sometimes (5)</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="financial_tension" value="7" id="fin4">
+                        <label for="fin4">Often (7)</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="financial_tension" value="10" id="fin5">
+                        <label for="fin5">Almost always (10)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 4: First Impact Area -->
+            <div class="question hidden" data-q="4">
+                <h3><span class="question-number">4</span>When pressure rises, which area gets hit first in your relationship or home?</h3>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" name="impact_area" value="communication" id="imp1" required>
+                        <label for="imp1">🗣️ Communication</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="impact_area" value="patience" id="imp2">
+                        <label for="imp2">😤 Patience</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="impact_area" value="trust" id="imp3">
+                        <label for="imp3">🤝 Trust</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="impact_area" value="quality_time" id="imp4">
+                        <label for="imp4">💑 Quality time</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="impact_area" value="peace" id="imp5">
+                        <label for="imp5">☮️ Peace in the home</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="impact_area" value="parenting" id="imp6">
+                        <label for="imp6">👨‍👩‍👧‍👦 Parenting unity</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 5: Difficult Conversations -->
+            <div class="question hidden" data-q="5">
+                <h3><span class="question-number">5</span>How easy is it to talk about difficult issues without it turning into conflict?</h3>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" name="difficult_talks" value="10" id="talk1" required>
+                        <label for="talk1">Very easy (10)</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="difficult_talks" value="7" id="talk2">
+                        <label for="talk2">Easy (7)</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="difficult_talks" value="5" id="talk3">
+                        <label for="talk3">Sometimes difficult (5)</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="difficult_talks" value="3" id="talk4">
+                        <label for="talk4">Difficult (3)</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="difficult_talks" value="1" id="talk5">
+                        <label for="talk5">Very difficult (1)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 6: Greatest Need -->
+            <div class="question hidden" data-q="6">
+                <h3><span class="question-number">6</span>What does your relationship or family need most right now?</h3>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" name="greatest_need" value="communication" id="need1" required>
+                        <label for="need1">💬 Better communication</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="greatest_need" value="financial_wisdom" id="need2">
+                        <label for="need2">💡 Financial wisdom</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="greatest_need" value="healing" id="need3">
+                        <label for="need3">❤️ Healing and trust</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="greatest_need" value="parenting" id="need4">
+                        <label for="need4">👨‍👩‍👧‍👦 Parenting support</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="greatest_need" value="emotional" id="need5">
+                        <label for="need5">💪 Emotional strength</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="greatest_need" value="spiritual" id="need6">
+                        <label for="need6">🙏 Spiritual growth</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 7: Open to Help -->
+            <div class="question hidden" data-q="7">
+                <h3><span class="question-number">7</span>Would you be open to receiving practical help to strengthen your relationship or family?</h3>
+                <div class="options">
+                    <div class="option">
+                        <input type="radio" name="open_to_help" value="event" id="help1" required>
+                        <label for="help1">✅ Yes, I'd attend an event</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="open_to_help" value="email" id="help2">
+                        <label for="help2">📧 Yes, send me resources by email</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="open_to_help" value="maybe" id="help3">
+                        <label for="help3">🤔 Maybe, I want to know more</label>
+                    </div>
+                    <div class="option">
+                        <input type="radio" name="open_to_help" value="no" id="help4">
+                        <label for="help4">❌ Not right now</label>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 8: Open Text -->
+            <div class="question hidden" data-q="8">
+                <h3><span class="question-number">8</span>Optional: In one sentence, what is the biggest challenge families are facing right now?</h3>
+                <textarea class="text-input" name="biggest_challenge" id="biggestChallenge" placeholder="Share your thoughts... (optional)"></textarea>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="nav-buttons">
+                <button type="button" class="btn btn-prev hidden" id="prevBtn">← Previous</button>
+                <button type="button" class="btn btn-next" id="nextBtn">Next →</button>
+                <button type="submit" class="btn btn-submit hidden" id="submitBtn">Submit Quiz</button>
+            </div>
+        </form>
+        
+        <!-- Results Section -->
+        <div class="results" id="results">
+            <div class="results-icon">🙏</div>
+            <h2>Thank You for Sharing</h2>
+            <p class="results-intro">Your response helps us create practical support for stronger relationships, healthier families, and stronger communities.</p>
+            
+            <div id="insightsContainer"></div>
+            
+            <div class="cta-section">
+                <h3>Ready to Take the Next Step?</h3>
+                <p>Join us at The Fatherhood Foundation events and discover practical tools to strengthen your home, even under pressure.</p>
+                <a href="https://thefatherhoodfoundation.org/events/my-great-marriage-2026" class="cta-button">Register for The MyGreatMarriage Event</a>
+            </div>
+            
+            <p class="anonymous-note">🔒 Your response is completely anonymous. We value your privacy.</p>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // SUPABASE CONFIGURATION - UPDATE THESE VALUES
+        // ============================================
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        
+        // Initialize Supabase client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let currentQuestion = 1;
+        const totalQuestions = 8;
+        const form = document.getElementById('quizForm');
+        const nextBtn = document.getElementById('nextBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressFill = document.getElementById('progressFill');
+        const results = document.getElementById('results');
+        const errorMessage = document.getElementById('errorMessage');
+        
+        function updateProgress() {
+            const progress = ((currentQuestion - 1) / totalQuestions) * 100;
+            progressFill.style.width = progress + '%';
+        }
+        
+        function showQuestion(num) {
+            document.querySelectorAll('.question').forEach(q => q.classList.add('hidden'));
+            document.querySelector(`.question[data-q="${num}"]`).classList.remove('hidden');
+            
+            prevBtn.classList.toggle('hidden', num === 1);
+            nextBtn.classList.toggle('hidden', num === totalQuestions);
+            submitBtn.classList.toggle('hidden', num !== totalQuestions);
+            
+            updateProgress();
+            validateCurrentQuestion();
+        }
+        
+        function validateCurrentQuestion() {
+            const currentQ = document.querySelector(`.question[data-q="${currentQuestion}"]`);
+            const inputs = currentQ.querySelectorAll('input[type="radio"]');
+            
+            if (inputs.length === 0) {
+                nextBtn.disabled = false;
+                submitBtn.disabled = false;
+                return;
+            }
+            
+            const name = inputs[0].name;
+            const checked = currentQ.querySelector(`input[name="${name}"]:checked`);
+            
+            nextBtn.disabled = !checked;
+            submitBtn.disabled = !checked;
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Add change listeners to all radio buttons
+        document.querySelectorAll('input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', validateCurrentQuestion);
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestion < totalQuestions) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            }
+        });
+        
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestion > 1) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        });
+        
+        function generateInsights(formData) {
+            const insights = [];
+            
+            // Location-based insight
+            const location = formData.get('location');
+            const locationNames = { namibia: 'Namibia', south_africa: 'South Africa', other: 'your region' };
+            insights.push({
+                title: 'Community Context',
+                text: `You're responding from ${locationNames[location]}. Economic and social pressures vary by region, and your input helps us tailor our programs to local realities.`
+            });
+            
+            // Primary pressure insight
+            const pressure = formData.get('pressure');
+            const pressureInsights = {
+                job: 'Job-related stress is one of the leading causes of marital tension. When employment is uncertain, it affects identity, self-worth, and family dynamics.',
+                financial: 'Financial pressure is a silent relationship killer. It creates anxiety that spills into communication, intimacy, and decision-making.',
+                communication: 'Communication breakdown often masks deeper issues. When couples stop truly talking, disconnection grows quickly.',
+                parenting: 'Parenting challenges can divide couples who approach child-rearing differently. Unity in parenting requires intentional alignment.',
+                time: 'Time poverty is a modern epidemic. When couples are too busy for each other, the relationship becomes transactional rather than relational.',
+                emotional: 'Emotional and mental stress affects how we show up in relationships. Self-care isn\'t selfish—it\'s necessary for healthy connection.'
+            };
+            insights.push({
+                title: 'Your Primary Pressure Point',
+                text: pressureInsights[pressure] || 'Understanding your main pressure source is the first step toward addressing it.'
+            });
+            
+            // Financial tension insight
+            const financialTension = parseInt(formData.get('financial_tension'));
+            if (financialTension >= 7) {
+                insights.push({
+                    title: 'Financial Stress Impact',
+                    text: 'High financial tension creates a chronic stress state that affects sleep, health, and relationship quality. Addressing this together, rather than avoiding it, is crucial.'
+                });
+            }
+            
+            // Communication difficulty insight
+            const difficultTalks = parseInt(formData.get('difficult_talks'));
+            if (difficultTalks <= 3) {
+                insights.push({
+                    title: 'Communication Challenge',
+                    text: 'Difficulty discussing hard topics without conflict often stems from unmet emotional needs or past negative experiences. Learning new communication patterns is possible at any stage.'
+                });
+            }
+            
+            // Impact area insight
+            const impactArea = formData.get('impact_area');
+            const impactInsights = {
+                communication: 'When communication breaks down first, it\'s often a symptom of feeling unheard or misunderstood.',
+                patience: 'Loss of patience indicates accumulated stress and unmet needs. Small irritations become big problems.',
+                trust: 'Trust erosion under pressure is dangerous. Rebuilding trust requires consistency and transparency.',
+                quality_time: 'When quality time disappears, the relationship loses its emotional bank account. Time together is an investment, not a luxury.',
+                peace: 'Loss of peace in the home affects everyone, especially children. Creating calm amid chaos is a skill that can be learned.',
+                parenting: 'Parenting disunity confuses children and creates marital tension. Presenting a united front requires private alignment.'
+            };
+            insights.push({
+                title: 'First Impact Zone',
+                text: impactInsights[impactArea] || 'Understanding what breaks first helps you build resilience in that area.'
+            });
+            
+            // Greatest need insight
+            const greatestNeed = formData.get('greatest_need');
+            const needInsights = {
+                communication: 'Better communication is the foundation of all relationship repair. It\'s a skill, not a personality trait.',
+                financial_wisdom: 'Financial wisdom includes both practical budgeting and emotional conversations about money.',
+                healing: 'Healing and trust restoration takes time, but it starts with one honest conversation and consistent follow-through.',
+                parenting: 'Parenting support helps couples align their approach and present a united front to their children.',
+                emotional: 'Emotional strength comes from healthy coping mechanisms and supportive community. You don\'t have to carry it alone.',
+                spiritual: 'Spiritual growth provides meaning, hope, and shared values that anchor relationships through storms.'
+            };
+            insights.push({
+                title: 'Your Stated Need',
+                text: needInsights[greatestNeed] || 'Recognizing what you need is the first step toward getting it.'
+            });
+            
+            return insights;
+        }
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Disable submit button and show loading
+            submitBtn.disabled = true;
+            submitBtn.classList.add('submitting');
+            submitBtn.textContent = 'Submitting...';
+            
+            const formData = new FormData(form);
+            
+            // Prepare data for Supabase
+            const quizData = {
+                location: formData.get('location'),
+                pressure: formData.get('pressure'),
+                financial_tension: parseInt(formData.get('financial_tension')),
+                impact_area: formData.get('impact_area'),
+                difficult_talks: parseInt(formData.get('difficult_talks')),
+                greatest_need: formData.get('greatest_need'),
+                open_to_help: formData.get('open_to_help'),
+                biggest_challenge: formData.get('biggest_challenge') || null
+            };
+            
+            try {
+                // Submit to Supabase
+                const { data, error } = await supabase
+                    .from('quiz_responses')
+                    .insert([quizData]);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                // Generate insights
+                const insights = generateInsights(formData);
+                
+                // Build insights HTML
+                const insightsContainer = document.getElementById('insightsContainer');
+                insightsContainer.innerHTML = insights.map(insight => `
+                    <div class="insight-card">
+                        <h4>${insight.title}</h4>
+                        <p>${insight.text}</p>
+                    </div>
+                `).join('');
+                
+                // Hide form, show results
+                form.style.display = 'none';
+                results.style.display = 'block';
+                
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('Error submitting quiz:', error);
+                showError('Failed to submit quiz. Please check your internet connection and try again.');
+                
+                // Re-enable submit button
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('submitting');
+                submitBtn.textContent = 'Submit Quiz';
+            }
+        });
+        
+        // Initialize
+        updateProgress();
+        validateCurrentQuestion();
+    </script>
+</body>
+</html>
